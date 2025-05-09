@@ -8,16 +8,16 @@ clients = []
 def handleClient(clientSocket, clientAdres):
     print(f"Nowy klient się połączył: {clientAdres}")
     try:
-        nazwa = clientSocket.recv(1024).decode().strip()
+        nazwa = clientSocket.recv(8192).decode().strip()
 
         if(any(c["name"] == nazwa for c in clients)):
-            clientSocket.send("Ta nazwa jest już zajęta".encode())
+            clientSocket.send(b'\x01'+"Ta nazwa jest już zajęta".encode())
             clientSocket.close()
             return
         clients.append({"name": nazwa, "socket": clientSocket})
         while True:
             try:
-                dane = clientSocket.recv(1024)
+                dane = clientSocket.recv(8192)
                 if not dane:
                     break
                 for client in clients:
@@ -26,7 +26,6 @@ def handleClient(clientSocket, clientAdres):
                             client["socket"].send(dane)
                         except:
                             pass
-
             except:
                 break
 
