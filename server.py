@@ -1,11 +1,9 @@
 import socket
 import threading
 
-# Informacje o serwerze
 SERVER_IP = socket.gethostbyname(socket.gethostname())
 SERVER_PORT = 50505
 clients = []
-
 
 def handleClient(clientSocket, clientAdres):
     print(f"Nowy klient się połączył: {clientAdres}")
@@ -18,18 +16,21 @@ def handleClient(clientSocket, clientAdres):
             return
 
         clients.append({"name": nazwa, "socket": clientSocket})
+        print(f"{nazwa} dołączył.")
 
         while True:
             try:
                 dane = clientSocket.recv(8192)
                 if not dane:
                     break
+                print(f"[{nazwa}] wysłał dane: {dane[:50]}...")
+
                 for client in clients:
                     if client["socket"] != clientSocket:
                         try:
-                            client["socket"].send(dane)
-                        except:
-                            pass
+                            client["socket"].send(f"{nazwa}: ".encode() + dane)
+                        except Exception as e:
+                            print(f"Nie udało się wysłać do {client['name']}: {e}")
             except:
                 break
 
@@ -40,7 +41,6 @@ def handleClient(clientSocket, clientAdres):
         clientSocket.close()
         clients[:] = [c for c in clients if c["socket"] != clientSocket]
 
-
 def startServer():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((SERVER_IP, SERVER_PORT))
@@ -49,7 +49,6 @@ def startServer():
 
     while True:
         clientSocket, clientAdres = server.accept()
-        thread = threading.Thread(target=handleClient, args=(clientSocket, clientAdres)).start()
-
+        threading.Thread(target=handleClient, args=(clientSocket, clientAdres)).start()
 
 startServer()
