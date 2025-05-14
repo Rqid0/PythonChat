@@ -5,4 +5,4 @@ Trzeba także pobrac biblioteki cryptograpyh i prompt_toolkit za pomocą jednej 
     python pip install cryptography prompt_toolkit
     python3 pip install cryptography prompt_toolkit
     py pip install cryptography prompt_toolkit
-    pip pip install cryptography prompt_toolkit
+    pip install cryptography prompt_toolkit
