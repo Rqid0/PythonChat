@@ -19,24 +19,22 @@ def isFernetKey(wiadomosc: str) -> bool:
 
 #funkcja obsługująca połączonych klientów
 def handleClient(clientSocket, clientAdres):
-    print(f"Nowy klient się połączył: {clientAdres}")
+    print(f"NOWY KLIENT SIĘ POŁĄCZYŁ: {clientAdres}")
     try:
         nazwa = clientSocket.recv(8192).decode().strip()
 
         if any(c["name"] == nazwa for c in clients):
-            clientSocket.send("Ta nazwa jest już zajęta".encode())
+            clientSocket.send("TA NAZWA JEST JUŻ ZAJĘTA".encode())
             clientSocket.close()
             return
 
         clients.append({"name": nazwa, "socket": clientSocket})
-        print(f"{nazwa} dołączył.")
 
         while True:
             try:
                 dane = clientSocket.recv(8192)
                 if not dane:
                     break
-                print(f"[{nazwa}] wysłał dane: {dane[:50]}...")
 
                 for client in clients:
                     if client["socket"] != clientSocket:
@@ -46,14 +44,14 @@ def handleClient(clientSocket, clientAdres):
                             else:
                                 client["socket"].send(f"{nazwa}: ".encode() + dane)
                         except Exception as e:
-                            print(f"Nie udało się wysłać do {client['name']}: {e}")
+                            print(f"NIE UDAŁO SIĘ WYSŁAĆ DO {client['name']}: {e}")
             except:
                 break
 
     except Exception as e:
-        print(f"Błąd z klientem: {e}")
+        print(f"BŁĄD Z KLIENTEM: {e}")
     finally:
-        print(f"Klient: {clientAdres} się rozłączył")
+        print(f"KLIENT: {clientAdres} SIĘ ROZŁĄCZYŁ")
         clientSocket.close()
         clients[:] = [c for c in clients if c["socket"] != clientSocket]
 
@@ -62,7 +60,7 @@ def startServer():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((SERVER_IP, SERVER_PORT))
     server.listen()
-    print(f"Server nasłuchuje na {SERVER_IP}:{SERVER_PORT}")
+    print(f"SERVER NASŁUCHUJE NA {SERVER_IP}:{SERVER_PORT}")
 
     while True:
         clientSocket, clientAdres = server.accept()

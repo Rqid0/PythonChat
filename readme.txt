@@ -1,3 +1,5 @@
+Czat grupowy z zaimplementowanym szyfrowaniem End2End
+
 Projekt tworzony przy użyciu python 3.13.2
 Aby poprawnie uruchomić klienta należy w pliku client.py ustawić SERVER_IP na ip komputera, na którym uruchomiony jest server.py
 Trzeba także pobrac biblioteki cryptograpyh i prompt_toolkit za pomocą jednej z komend (jedna będzie działąć w zależności od komputera):

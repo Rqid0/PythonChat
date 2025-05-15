@@ -27,10 +27,10 @@ def reciveMsg(sock):
                 return
 
             try:
-                usernameEndIdx = odpowiedz.find(b": ")
-                if usernameEndIdx != -1:
-                    username = odpowiedz[:usernameEndIdx].decode()
-                    encrypted_message = odpowiedz[usernameEndIdx + 2:]
+                znakRozdzielajacy = odpowiedz.find(b": ")
+                if znakRozdzielajacy != -1:
+                    username = odpowiedz[:znakRozdzielajacy].decode()
+                    encrypted_message = odpowiedz[znakRozdzielajacy + 2:]
 
                     wiadomosc = Fernet(klucz).decrypt(encrypted_message).decode()
 
@@ -40,9 +40,9 @@ def reciveMsg(sock):
                 else:
                     klucz = odpowiedz
             except Exception as e:
-                run_in_terminal(lambda: print(f"\n[Błąd deszyfrowania] {e}", end='', flush=True))
+                run_in_terminal(lambda: print(f"\nBŁĄD DESZYFROWANIA {e}", end='', flush=True))
         except Exception as err:
-            run_in_terminal(lambda: print(f"\n[Błąd odbierania danych] {err}", end='', flush=True))
+            run_in_terminal(lambda: print(f"\nBŁĄD ODBIERANIA DANYCH {err}", end='', flush=True))
 
 
 #funkcja rozpoczynająca pracę klienta
