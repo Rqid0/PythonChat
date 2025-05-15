@@ -1,10 +1,23 @@
 import socket
 import threading
+import base64
+from cryptography.fernet import Fernet
 
 SERVER_IP = socket.gethostbyname(socket.gethostname())
 SERVER_PORT = 50505
 clients = []
 
+
+#funkcja sprawdzająca, czy wiadomość jest kluczem używanym do kodowania (bardzo małą szansa na pomyłke w przypadku normalnej wiadomości)
+def isFernetKey(wiadomosc: str) -> bool:
+    try:
+        f = Fernet(wiadomosc)
+        _ = f.encrypt(b"test")
+        return True
+    except Exception:
+        return False
+
+#funkcja obsługująca połączonych klientów
 def handleClient(clientSocket, clientAdres):
     print(f"Nowy klient się połączył: {clientAdres}")
     try:
@@ -28,7 +41,10 @@ def handleClient(clientSocket, clientAdres):
                 for client in clients:
                     if client["socket"] != clientSocket:
                         try:
-                            client["socket"].send(f"{nazwa}: ".encode() + dane)
+                            if(isFernetKey(dane)):
+                                client["socket"].send(dane)
+                            else:
+                                client["socket"].send(f"{nazwa}: ".encode() + dane)
                         except Exception as e:
                             print(f"Nie udało się wysłać do {client['name']}: {e}")
             except:
@@ -41,6 +57,7 @@ def handleClient(clientSocket, clientAdres):
         clientSocket.close()
         clients[:] = [c for c in clients if c["socket"] != clientSocket]
 
+#funkcja rozpoczynająca pracę servera
 def startServer():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((SERVER_IP, SERVER_PORT))

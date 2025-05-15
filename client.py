@@ -11,19 +11,13 @@ import sys
 SERVER_IP = "192.168.100.158"
 SERVER_PORT = 50505
 
-def loadKey():
-    try:
-        with open("wspolnyklucz.key", "rb") as keyFile:
-            return keyFile.read()
-    except FileNotFoundError:
-        print("Plik z kluczem nie istnieje!")
-        exit()
-
-klucz = loadKey()
+klucz = Fernet.generate_key()
 
 session = PromptSession()
 
+#funkcja obsługująca otrzymywanie wiadomości
 def reciveMsg(sock):
+    global klucz
     asyncio.set_event_loop(asyncio.new_event_loop())
 
     while True:
@@ -44,20 +38,22 @@ def reciveMsg(sock):
 
                     run_in_terminal(lambda: print(f"\n{username}: {wiadomosc}", end='', flush=True))
                 else:
-                    print("[ERROR] Nieprawidłowy format wiadomości")
+                    klucz = odpowiedz
             except Exception as e:
                 run_in_terminal(lambda: print(f"\n[Błąd deszyfrowania] {e}", end='', flush=True))
         except Exception as err:
             run_in_terminal(lambda: print(f"\n[Błąd odbierania danych] {err}", end='', flush=True))
 
 
-
+#funkcja rozpoczynająca pracę klienta
 def startClient():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((SERVER_IP, SERVER_PORT))
     nazwa = input("Podaj nazwę użytkownika: ")
     sock.send(nazwa.encode())
     threading.Thread(target=reciveMsg, args=(sock,), daemon=True).start()
+
+    sock.send(klucz) #wyślij nowy klucz do servera
 
     with patch_stdout():
         while True:
